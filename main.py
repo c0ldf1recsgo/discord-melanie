@@ -10,8 +10,9 @@ from discord.ext import commands
 def get_prefix(client, message):
     return db['prefix'][0]
 
+intents = discord.Intents().all()
 client = discord.Client()
-client = commands.Bot(command_prefix = get_prefix, help_command=None)
+client = commands.Bot(command_prefix = get_prefix, help_command=None, intents=intents)
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):

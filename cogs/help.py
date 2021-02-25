@@ -43,7 +43,7 @@ class Help(commands.Cog):
             embedVar.add_field(
             name="5. Hành động", value="slap, kiss, hug, pat", inline=False)
             embedVar.add_field(
-            name="6. Misc", value="quote, math, currency", inline=False)
+            name="6. Misc", value="snipe, quote, math, currency", inline=False)
             embedVar.add_field(
             name="7. Settings", value="ping, prefix, nickname", inline=False)
             msg = await ctx.channel.send(embed=embedVar)
@@ -80,7 +80,7 @@ class Help(commands.Cog):
         elif args[0] == str(6) or args[0] == 'misc':
             embedVar = discord.Embed(
             title="Miscellaneous",
-            description="**Xem câu nói bất kì:** `{0}quote`.\nAliases: `quote`, `quotes`, `inspire`, `q`\n\n**Bot sủa:** `{0}say`.\nAliases: `s`\n\n**Bot sủa bằng emoji:** `{0}sayemo`.\nAliases: `se`\n\n**Chuyển đổi tiền tệ:** `{0}currency [số tiền] [trước] [sau]`.\nAliases: `cur`\n\n".format(prefix),
+            description="**Xem tin bị xóa:** snipe, spy.\nDùng `{0}help` `snipe` để xem chi tiết\n\n**Xem câu nói bất kì:** `{0}quote`.\nAliases: `quote`, `quotes`, `inspire`, `q`\n\n**Bot sủa:** `{0}say`.\nAliases: `s`\n\n**Bot sủa bằng emoji:** `{0}sayemo`.\nAliases: `se`\n\n**Chuyển đổi tiền tệ:** `{0}currency [số tiền] [trước] [sau]`.\nAliases: `cur`\n\n".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] == str(7) or args[0] == 'settings':
@@ -99,6 +99,12 @@ class Help(commands.Cog):
             embedVar = discord.Embed(
             title="Trò chơi Xì Zách",
             description="`{0}blackjack` hoặc `{0}bj` để xem tiếp hướng dẫn. :yaya:".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['spy', 'snipe']:
+            embedVar = discord.Embed(
+            title="Xem tin đã xóa",
+            description="- Dùng lệnh:  `{0}snipe`.\nAliases: `spy`\n\n- Xem danh sách các tin đã xóa gần nhất:  `{0}snipelog`.\nAliases: `snipel`, `snlog`, `spylog`, `spyl`".format(prefix),
             color=0x34ebae)
             msg = await ctx.channel.send(embed=embedVar)
         else:

@@ -7,6 +7,8 @@ import json
 
 from replit import db
 
+from .func import converter as conv
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
@@ -63,6 +65,19 @@ class Misc(commands.Cog):
     
 
     # Commands
+    @commands.command(aliases=['ava'])
+    @cooldown(1, 3, BucketType.user)
+    async def avatar(self, ctx, *, member:Optional[conv.FuzzyMember]=None):
+        print(ctx.author.id)
+        member = member or ctx.author
+        embed = discord.Embed(description=ctx.author.display_name + ' muốn xem ảnh của bạn', color=discord.Color.random())
+        embed.title = str(member)
+        embed.set_image(url=str(member.avatar_url).replace('webp', 'png'))
+        embed.timestamp = datetime.now().astimezone()
+        await ctx.send(embed=embed)
+        print('sent avatar')
+    
+    
     @commands.command(aliases=['m', 'cal', 'tinh', 'calculate', 'math'])
     @cooldown(1, 3, BucketType.user)
     async def _math(self, ctx, *args):

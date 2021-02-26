@@ -46,6 +46,8 @@ class Help(commands.Cog):
             name="6. Misc", value="avatar, snipe, quote, math, currency, translate", inline=False)
             embedVar.add_field(
             name="7. Settings", value="ping, prefix, nickname", inline=False)
+            embedVar.add_field(
+            name="8. Levels and ranking", value="level, lvl | leaderboard, rank", inline=False)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] == str(1) or args[0] == 'hello':
             embedVar = discord.Embed(
@@ -87,6 +89,12 @@ class Help(commands.Cog):
             embedVar = discord.Embed(
             title="Settings",
             description="- Ping: `{0}ping`.\n\n- Sửa prefix: `{0}prefix [new_prefix]`\n\n- Sửa nickname: `{0}nick @tag [new_nickname]`\nChỉ sửa được nickname của bản thân nhưng phải tag bản thân vào nhé :))))".format(prefix),
+            color=0x00ff00)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] == str(8) or args[0] in ['level', 'lvl', 'leaderboard', 'rank', 'levels']:
+            embedVar = discord.Embed(
+            title="levels and Ranking",
+            description="- Kiểm tra cấp độ: `{0}level`.\nAliases: `lvl`\n\n- Xem top xếp hạng: `{0}rank`\nAliases: `leaderboard`, `levels`\n\n***Lưu ý:*** Hai lệnh trên chỉ được thực hiện tại kênh  #🔥-spam-bot-🤖 .Hệ thống sẽ chỉ tính điểm với thời gian giữa các tin nhắn vừa đủ nên spam sẽ không được tính. Đồng thời chỉ các kênh trong mục **【Kênh Chat】** mới được công nhận.".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['lt', 'loto']:

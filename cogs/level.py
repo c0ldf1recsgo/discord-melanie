@@ -9,7 +9,7 @@ bot_channel = [706457437405708288, 814344317882597406]
 # bot_channel_test = 814344317882597406
 talk_channel = [797018066928009249, 705598305857437696, 761065872613703680, 705277306536591420, 706001347887104051, 706004773282906154, 706108774401703956, 707151882694688768, 706826942288232479, 705284188324102245, 712288193453490266, 719502190367997953]
 
-cluster = MongoClient("mongodb+srv://melanie:c0ldf1re@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = MongoClient("mongodb+srv://<name>:<password>@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 
 levelling = cluster['discord']['levelsystem']
 

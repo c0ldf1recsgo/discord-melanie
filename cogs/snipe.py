@@ -1,4 +1,5 @@
 # pylint: disable=relative-beyond-top-level
+# Inspired by https://github.com/DleanJeans
 
 import typing
 import io
@@ -150,11 +151,6 @@ class Spy(commands.Cog):
             prev_msg = m
         
         if msgs:
-            if state == 'deleted':
-              footer = 'Đã xóa tại'
-            else:
-              footer = 'Đã sửa tại'
-            embed.set_footer(text=footer)
             embed.description = '\n'.join(msgs)
 
     def get_or_create_log(self, channel):

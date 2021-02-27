@@ -17,7 +17,7 @@ class Level(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self._cd = commands.CooldownMapping.from_cooldown(1, 6.0, commands.BucketType.member)
+        self._cd = commands.CooldownMapping.from_cooldown(1, 30.0, commands.BucketType.member)
 
     
     def get_ratelimit(self, message: discord.Message) -> typing.Optional[int]:

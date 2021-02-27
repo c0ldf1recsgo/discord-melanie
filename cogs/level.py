@@ -51,8 +51,6 @@ class Level(commands.Cog):
                                 break
                             lvl += 1
                         xp -= ((50*((lvl-1)**2)) + (50*(lvl-1)) + 50)
-                        # if xp == 0:
-                        # print(old_lvl, lvl)
                         if old_lvl < lvl:
                             _channel = self.client.get_channel(706457437405708288)
                             await _channel.send(f"Chúc mừng {message.author.mention}! Bạn vừa đạt **Cấp {lvl-1}** :diamond_shape_with_a_dot_inside:!")
@@ -76,7 +74,8 @@ class Level(commands.Cog):
                         break
                     lvl += 1
                 xp -= ((50*((lvl-1)**2)) + (50*(lvl-1)))
-                boxes = int((xp/(200*((1/2) * lvl))) * 20)
+                # boxes = int((xp/(200*((1/2) * lvl))) * 20)
+                float_boxes = (xp/(200*((1/2) * lvl))) * 10
                 ranking = levelling.find().sort("xp", -1)
                 i=1
                 temprank = 0
@@ -91,7 +90,10 @@ class Level(commands.Cog):
                 embed.add_field(name="Cấp", value=lvl-1, inline=True)
                 embed.add_field(name="Hạng", value=temprank, inline=True)
                 embed.add_field(name="XP", value=f'{xp}/{int(200*((1/2)*lvl))}', inline=True)
-                embed.add_field(name="Tiến trình:", value=boxes * ":blue_square:" + (20-boxes) * ":white_large_square:", inline=False)
+                if (float_boxes % 1) < 0.5:
+                  embed.add_field(name="Tiến trình:", value=int(float_boxes) * ":full_moon:" + (10-int(float_boxes)) * ":new_moon:", inline=False)
+                else:
+                  embed.add_field(name="Tiến trình:", value=int(float_boxes) * ":full_moon:"+ ':last_quarter_moon:' + (10-int(float_boxes)) * ":new_moon:", inline=False)
                 embed.set_thumbnail(url=ctx.author.avatar_url)
                 await ctx.send(embed=embed)
 

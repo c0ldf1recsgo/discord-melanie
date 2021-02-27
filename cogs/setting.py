@@ -1,9 +1,11 @@
 from typing import Optional
+from datetime import datetime
 
 from replit import db
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import cooldown, BucketType
 
 class Setting(commands.Cog):
 
@@ -46,8 +48,8 @@ class Setting(commands.Cog):
                 await ctx.send(f'Prefix đã được đổi thành `{new_prefix}`')
             else:
                 await ctx.send('Bạn làm gì có quyền sửa prefix hihi.')
-
-
+     
+    
     @commands.command(aliases=['nickname'])
     async def nick(self, ctx, member: Optional[discord.Member]=None, *args):
         print(ctx.author.id)
@@ -80,6 +82,32 @@ class Setting(commands.Cog):
                 except:
                     await ctx.send('I need permission to Manage Nicknames.')
                     print('Changed nick name failed')
+                    
+                    
+    @commands.command(aliases=['ihcmus', 'melanie'])
+    @cooldown(1, 3, BucketType.user)
+    async def bot(self, ctx, *args):
+        print(ctx.author.id)
+        # id = '797016488280064032'
+        if not args:
+            me = await self.client.fetch_user('797016488280064032')
+            created_str = 'January 08 2021 at 08:18'
+            joined_str = 'January 11 2021 at 08:04'
+            created = datetime.strptime(created_str, '%B %d %Y at %H:%M')
+            joined = datetime.strptime(joined_str, '%B %d %Y at %H:%M')
+            today = datetime.now()
+            bd = today - created
+            jd = today - joined
+            embed = discord.Embed(title='Tôi là Melanie', description='Tên khai sanh: iHCMUS@6172', color=discord.Color.purple())
+            
+            embed.set_thumbnail(url=me.avatar_url) 
+            embed.add_field(name=f'Ngày sanh: {bd.days} ngày tuổi', value=created_str, inline=False)
+            embed.add_field(name=f'Tham gia {ctx.message.guild.name}: {jd.days} ngày', value=joined_str, inline=False)
+            embed.add_field(name='Version:', value='`1.3.1a`', inline=False)
+            
+            await ctx.send(embed=embed)
+        else:
+            pass
 
 def setup(client):
     client.add_cog(Setting(client))

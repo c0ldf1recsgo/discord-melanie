@@ -1,4 +1,5 @@
 import typing
+import random
 from pymongo import MongoClient
 
 import discord
@@ -36,17 +37,25 @@ class Level(commands.Cog):
                         newuser = {"id": message.author.id, "xp": 100}
                         levelling.insert_one(newuser)
                     else:
-                        xp = stats["xp"] + 5
+                        old_xp = stats["xp"]
+                        old_lvl = 0
+                        while True:
+                            if old_xp < ((50*(old_lvl**2)) + (50*(old_lvl-1)) + 50):
+                                break
+                            old_lvl += 1
+                        xp = stats["xp"] + random.randint(4,8)
                         levelling.update_one({"id":message.author.id}, {"$set":{"xp":xp}})
                         lvl = 0
                         while True:
-                            if xp < ((50*(lvl**2)) + (50*(lvl-1))):
+                            if xp < ((50*(lvl**2)) + (50*(lvl-1)) + 50):
                                 break
                             lvl += 1
-                        xp -= ((50*((lvl-1)**2)) + (50*(lvl-1)))
-                        if xp == 0:
-                            _channel = self.client.get_channel(814344317882597406)
-                            await _channel.send(f"Chúc mừng {message.author.mention}! Bạn vừa đạt **Cấp {lvl}** :diamond_shape_with_a_dot_inside:!")
+                        xp -= ((50*((lvl-1)**2)) + (50*(lvl-1)) + 50)
+                        # if xp == 0:
+                        # print(old_lvl, lvl)
+                        if old_lvl < lvl:
+                            _channel = self.client.get_channel(706457437405708288)
+                            await _channel.send(f"Chúc mừng {message.author.mention}! Bạn vừa đạt **Cấp {lvl-1}** :diamond_shape_with_a_dot_inside:!")
     
 
     @commands.command(aliases=['lvl'])

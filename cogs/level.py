@@ -127,7 +127,35 @@ class Level(commands.Cog):
                 return user == ctx.author
             reaction, user = await self.client.wait_for('reaction_add', check=check)
             await _msg.delete()
-            
+    
+    
+    @commands.command(aliases=['levelupd', 'lvlupd'])
+    async def levelupdisable(self, ctx, *args):
+        if not args:
+            stats = levelling.find_one({"id": ctx.author.id})
+            noti = stats["noti"]
+            if noti == 1:
+                levelling.update_one({"id":ctx.author.id}, {"$set":{"noti":0}})
+                await ctx.send('Đã tắt thông báo lên cấp. Bật lại bằng lệnh `levelupenable` nhé.')
+            else:
+                await ctx.send('Thông báo lên cấp đã tắt. Bật lại bằng lệnh `levelupenable` nhé.')
+        else:
+            pass
+
+      
+    @commands.command(aliases=['levelupe', 'lvlupe'])
+    async def levelupenable(self, ctx, *args):
+        if not args:
+            stats = levelling.find_one({"id": ctx.author.id})
+            noti = stats["noti"]
+            if noti == 0:
+                levelling.update_one({"id":ctx.author.id}, {"$set":{"noti":1}})
+                await ctx.send('Đã bật thông báo lên cấp. Tắt đi bằng lệnh `levelupdisable` nhé.')
+            else:
+                await ctx.send('Thông báo lên cấp đã bật sẵn. Tắt đi bằng lệnh `levelupdisable` nhé.')
+        else:
+            pass
+        
 
     @commands.command()
     @commands.is_owner()

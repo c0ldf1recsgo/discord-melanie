@@ -1,3 +1,3 @@
 # discord-melanie
-Melanie Discord Bot v1.3.1a1
+Melanie Discord Bot v1.3.2a
 not include .env file

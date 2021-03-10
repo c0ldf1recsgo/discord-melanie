@@ -1,47 +1,72 @@
 # pylint: disable=relative-beyond-top-level
 import random
+import json
 
-from replit import db
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
 
+def get_userid():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['user_id']
+
+def get_username():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['user_name']
+
+def get_prefix():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['prefix']
+
 def get_chuc():
-    return db['cau_chuc']
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['cau_chuc']
 
 def get_tru():
-    return db['cau_tru']
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['cau_tru']
 
 def update_cau_chuc(cau_chuc_message):
-  if ('cau_chuc' in db.keys()):
-    cau_chuc = db['cau_chuc']
-    cau_chuc.append(cau_chuc_message)
-    db['cau_chuc'] = cau_chuc
-  else:
-    db['cau_chuc'] = [cau_chuc_message]
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    
+    prefix['cau_chuc'].append(cau_chuc_message)
+    with open('./cogs/prefixes.json', 'r') as f:
+        json.dumb(prefix, f, indent=4)
 
 def delete_cau_chuc(index):
-  list_cau_chuc = db['cau_chuc']
-  if len(list_cau_chuc) >= index:
-      del list_cau_chuc[index - 1]
-  db['cau_chuc'] = list_cau_chuc
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    
+    if len(prefix['cau_chuc']) >= index:
+        del prefix['cau_chuc'][index - 1]
+    with open('./cogs/prefixes.json', 'r') as f:
+        json.dumb(prefix, f, indent=4)
 
 def update_cau_tru(cau_tru_message):
-  if ('cau_tru' in db.keys()):
-    cau_tru = db['cau_tru']
-    cau_tru.append(cau_tru_message)
-    db['cau_tru'] = cau_tru
-  else:
-    db['cau_tru'] = [cau_tru_message]
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    
+    prefix['cau_tru'].append(cau_tru_message)
+    with open('./cogs/prefixes.json', 'r') as f:
+        json.dumb(prefix, f, indent=4)
 
 def delete_cau_tru(index):
-  list_cau_tru = db['cau_tru']
-  if len(list_cau_tru) >= index:
-      del list_cau_tru[index - 1]
-  db['cau_tru'] = list_cau_tru
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    
+    if len(prefix['cau_tru']) >= index:
+        del prefix['cau_tru'][index - 1]
+    with open('./cogs/prefixes.json', 'r') as f:
+        json.dumb(prefix, f, indent=4)
 
-prefix = db['prefix'][0]
+prefix = get_prefix()
 class Talk(commands.Cog):
 
     def __init__(self, client):
@@ -84,7 +109,7 @@ class Talk(commands.Cog):
           'Ơ, da dạo này lắm mụn thế?', 'Vẫn chưa có người yêu à?', 'Sao gầy thế, đói ăn à?',
           'Lâu không gặp, mày tăng bao cân rồi nhìn đẫy đà quá', 'Đồ Ế!' , 'Cuộc vui nào rồi cũng sẽ có lúc tàn, đừng vội mừng.', 'Cười đi khi còn có thể, sau này chẳng còn cười được đâu.'
         ]
-        options = db['cau_tru']
+        options = get_tru()
         options = options + cau_tru
         print(ctx.author.id)
         await ctx.channel.send(random.choice(options))
@@ -137,15 +162,15 @@ class Talk(commands.Cog):
         print('xoa cau chuc(empty)')
       elif args[0].isnumeric():
         print(ctx.author.id)
-        if 'cau_chuc' in db.keys():
-          if(int(args[0]) <= len(db['cau_chuc'])):
-            index = int(args[0])
-            delete_cau_chuc(index)
-            await ctx.channel.send('Đã xóa lời chúc :(')
-            print('xoa cau chuc thanh cong')
-          else:
-            await ctx.channel.send('Không có câu chúc nào có số thứ tự này')
-            print('xoa cau chuc fail')
+        list_chuc = get_chuc()
+        if(int(args[0]) <= len(list_chuc)):
+          index = int(args[0])
+          delete_cau_chuc(index)
+          await ctx.channel.send('Đã xóa lời chúc :(')
+          print('xoa cau chuc thanh cong')
+        else:
+          await ctx.channel.send('Không có câu chúc nào có số thứ tự này')
+          print('xoa cau chuc fail')
 
 
     @commands.command(aliases=['dtru'])
@@ -159,15 +184,15 @@ class Talk(commands.Cog):
         print('xoa cau tru(empty)')
       elif args[0].isnumeric():
         print(ctx.author.id)
-        if 'cau_tru' in db.keys():
-          if(int(args[0]) <= len(db['cau_tru'])):
-            index = int(args[0])
-            delete_cau_tru(index)
-            await ctx.channel.send('Đã xóa câu trù :(')
-            print('xoa cau tru thanh cong')
-          else:
-            await ctx.channel.send('Không có câu trù nào có số thứ tự này')
-            print('xoa cau tru fail')
+        list_tru = get_tru()
+        if(int(args[0]) <= len(list_tru)):
+          index = int(args[0])
+          delete_cau_tru(index)
+          await ctx.channel.send('Đã xóa câu trù :(')
+          print('xoa cau tru thanh cong')
+        else:
+          await ctx.channel.send('Không có câu trù nào có số thứ tự này')
+          print('xoa cau tru fail')
 
 
     @commands.command(aliases=['ac'])
@@ -178,7 +203,7 @@ class Talk(commands.Cog):
 
       print(ctx.author.id)
       print('danh sach chuc')
-      list_cau_chuc = db['cau_chuc']
+      list_cau_chuc = get_chuc()
       if len(list_cau_chuc) > 0:
         n=8
         b = [list_cau_chuc[i*n : (i+1)*n] for i in range((len(list_cau_chuc) + n - 1) // n)]
@@ -242,7 +267,7 @@ class Talk(commands.Cog):
         return
       print(ctx.author.id)
       print('danh sach tru')
-      list_cau_tru = db['cau_tru']
+      list_cau_tru = get_tru()
       if len(list_cau_tru) > 0:
         n=8
         b = [list_cau_tru[i*n : (i+1)*n] for i in range((len(list_cau_tru) + n - 1) // n)]
@@ -299,8 +324,8 @@ class Talk(commands.Cog):
       if ctx.author == self.client.user:
         return
       if not args:
-        list_id = db['user_id']
-        list_name = db['user_name']
+        list_id = get_userid()
+        list_name = get_username()
         group = tuple(zip(list_id, list_name))
         cau_chao = [
           'Chào bạn {0} xinh đẹp nhó.', 'Xin chào bạn {0} yêu dấu.',

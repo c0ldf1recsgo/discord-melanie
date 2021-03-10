@@ -3,12 +3,12 @@ from datetime import datetime
 import pytz
 import random
 
-from replit import db
-
 from discord.ext import commands, tasks
 
-def get_prefix():
-    return db['prefix'][0]
+# def get_prefix():
+#     with open('./cogs/prefixes.json', 'r') as f:
+#         prefix = json.load(f)
+#     return prefix['prefix']
 
 class AOS(commands.Cog):
 

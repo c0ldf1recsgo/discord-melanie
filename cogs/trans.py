@@ -17,6 +17,7 @@ class Trans(commands.Cog):
 
     @commands.command(aliases=['trans', 'tr', 'translate'])
     async def translator(self, ctx, src2dest:Optional[translate.Src2Dest]='auto>vi', *, text=None):
+        print(ctx.author.id, 'translate')
         if not text:
             last_message = await ctx.history(limit=1, before=ctx.message).flatten()
             text = last_message[0].clean_content or translate.NO_TEXT

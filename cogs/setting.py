@@ -1,11 +1,12 @@
 from typing import Optional
 from datetime import datetime
+import json
 
-from replit import db
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
+
 
 class Setting(commands.Cog):
 
@@ -37,19 +38,18 @@ class Setting(commands.Cog):
             role2 = discord.utils.get(ctx.guild.roles, name="Administrator")
             role3 = discord.utils.get(ctx.guild.roles, name="Owner")
             if (role in ctx.author.roles) or (role2 in ctx.author.roles) or (role3 in ctx.author.roles):
-                # with open('./cogs/prefixes.json', 'r') as f:
-                #     prefixes = json.load(f)
-                # prefixes['prefix'] = new_prefix
+                with open('./cogs/prefixes.json', 'r') as f:
+                    prefixes = json.load(f)
+                prefixes['prefix'] = new_prefix
 
-                # with open('./cogs/prefixes.json', 'w') as f:
-                #     json.dump(prefixes, f, indent=4)
-                db['prefix'] = [new_prefix]
+                with open('./cogs/prefixes.json', 'w') as f:
+                    json.dump(prefixes, f, indent=4)
                     
                 await ctx.send(f'Prefix đã được đổi thành `{new_prefix}`')
             else:
                 await ctx.send('Bạn làm gì có quyền sửa prefix hihi.')
-     
-    
+
+
     @commands.command(aliases=['nickname'])
     async def nick(self, ctx, member: Optional[discord.Member]=None, *args):
         print(ctx.author.id)
@@ -82,8 +82,8 @@ class Setting(commands.Cog):
                 except:
                     await ctx.send('I need permission to Manage Nicknames.')
                     print('Changed nick name failed')
-                    
-                    
+
+
     @commands.command(aliases=['ihcmus', 'melanie'])
     @cooldown(1, 3, BucketType.user)
     async def bot(self, ctx, *args):
@@ -103,7 +103,7 @@ class Setting(commands.Cog):
             embed.set_thumbnail(url=me.avatar_url) 
             embed.add_field(name=f'Ngày sanh: {bd.days} ngày tuổi', value=created_str, inline=False)
             embed.add_field(name=f'Tham gia {ctx.message.guild.name}: {jd.days} ngày', value=joined_str, inline=False)
-            embed.add_field(name='Version:', value='`1.3.1a`', inline=False)
+            embed.add_field(name='Version:', value='`1.3.2a`', inline=False)
             
             await ctx.send(embed=embed)
         else:

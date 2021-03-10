@@ -1,11 +1,13 @@
-from replit import db
+import json
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
 
 def get_prefix():
-    return db['prefix'][0]
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['prefix']
 
 class Help(commands.Cog):
 
@@ -145,10 +147,10 @@ class Help(commands.Cog):
             description="Lệnh: `{0}currency [số tiền] [trước] [sau]`.\nAliases: `cur`\n\n**Dịch:** `{0}translate [lang1]>[lang2] [trước] [sau]`.\nAliases: `tr`, `trans`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
-        elif args[0] in ['currency', 'cur']:
+        elif args[0] in ['translate', 'trans', 'tr', 'langs', 'tls', 'translatelangs']:
             embedVar = discord.Embed(
             title="Dịch ngôn ngữ",
-            description="**Dịch:** `{0}translate [lang1]>[lang2] [trước] [sau]`.\nAliases: `tr`, `trans`\n\nKhi không có `[lang1]>[lang2]` sẽ tự động dịch sang tiếng Việt.".format(prefix),
+            description="**Dịch:** `{0}translate [lang1]>[lang2] [trước] [sau]`.\nAliases: `tr`, `trans`\n\nKhi không có `[lang1]>[lang2]` sẽ tự động dịch sang tiếng Việt.\n\n**Danh sách các code ngôn ngữ:** `{0}translatelangs`\nAliases: `tls`, `langs`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['ping', 'prefix', 'nick']:

@@ -1,6 +1,7 @@
 import typing
-import random
 from pymongo import MongoClient
+
+import random
 
 import discord
 from discord.ext import commands
@@ -8,9 +9,9 @@ from discord.ext.commands import cooldown, BucketType
 
 bot_channel = [706457437405708288, 814344317882597406]
 # bot_channel_test = 814344317882597406
-talk_channel = [797018066928009249, 705598305857437696, 761065872613703680, 705277306536591420, 706001347887104051, 706004773282906154, 706108774401703956, 707151882694688768, 706826942288232479, 705284188324102245, 712288193453490266, 719502190367997953]
+talk_channel = [797018066928009249, 705598305857437696, 761065872613703680, 705277306536591420, 706001347887104051, 706004773282906154, 706108774401703956, 707151882694688768, 706826942288232479, 705284188324102245, 712288193453490266, 719502190367997953, 814344317882597406]
 
-cluster = MongoClient("mongodb+srv://<name>:<password>@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = MongoClient("mongodb+srv://melanie:c0ldf1re@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 
 levelling = cluster['discord']['levelsystem']
 
@@ -34,7 +35,7 @@ class Level(commands.Cog):
                 stats = levelling.find_one({"id": message.author.id})
                 if not message.author.bot:
                     if stats is None:
-                        newuser = {"id": message.author.id, "xp": 100}
+                        newuser = {"id": message.author.id, "xp": 100, "noti":1}
                         levelling.insert_one(newuser)
                     else:
                         old_xp = stats["xp"]
@@ -51,20 +52,24 @@ class Level(commands.Cog):
                                 break
                             lvl += 1
                         xp -= ((50*((lvl-1)**2)) + (50*(lvl-1)) + 50)
-                        if old_lvl < lvl:
+                        # if xp == 0:
+                        # print(old_lvl, lvl)
+                        noti = stats["noti"]
+                        if old_lvl < lvl and noti == 1:
                             _channel = self.client.get_channel(706457437405708288)
                             await _channel.send(f"Chúc mừng {message.author.mention}! Bạn vừa đạt **Cấp {lvl-1}** :diamond_shape_with_a_dot_inside:!")
     
 
     @commands.command(aliases=['lvl'])
     @cooldown(1, 5, BucketType.user)
-    async def level(self, ctx):
+    async def level(self, ctx, member:typing.Optional[discord.Member]=None):
         print(ctx.author.id)
         print('sent level')
         if ctx.channel.id in bot_channel:
-            stats = levelling.find_one({"id": ctx.author.id})
+            member = member or ctx.author
+            stats = levelling.find_one({"id": member.id})
             if stats is None:
-                embed = discord.Embed(description="You haven't sent any messages.")    
+                embed = discord.Embed(description="Cần gửi tin nhắn ở Mục Kênh Chat trước nhé.") 
                 await ctx.send(embed=embed)  
             else:
                 xp = stats["xp"]
@@ -80,13 +85,13 @@ class Level(commands.Cog):
                 i=1
                 temprank = 0
                 for x in ranking:
-                  if str(ctx.author.id) == str(x['id']):
+                  if str(member.id) == str(x['id']):
                     temprank = i
                     break
                   else:
                     i+=1
-                embed = discord.Embed(title=f"Cấp độ của {ctx.author.name}", color=discord.Color.blue())
-                embed.add_field(name="Tên", value=ctx.author.mention, inline=True)
+                embed = discord.Embed(title=f"Cấp độ của {member.name}", color=discord.Color.blue())
+                embed.add_field(name="Tên", value=member.mention, inline=True)
                 embed.add_field(name="Cấp", value=lvl-1, inline=True)
                 embed.add_field(name="Hạng", value=temprank, inline=True)
                 embed.add_field(name="XP", value=f'{xp}/{int(200*((1/2)*lvl))}', inline=True)
@@ -94,7 +99,7 @@ class Level(commands.Cog):
                   embed.add_field(name="Tiến trình:", value=int(float_boxes) * ":full_moon:" + (10-int(float_boxes)) * ":new_moon:", inline=False)
                 else:
                   embed.add_field(name="Tiến trình:", value=int(float_boxes) * ":full_moon:"+ ':last_quarter_moon:' + (10-int(float_boxes)) * ":new_moon:", inline=False)
-                embed.set_thumbnail(url=ctx.author.avatar_url)
+                embed.set_thumbnail(url=member.avatar_url)
                 await ctx.send(embed=embed)
 
       
@@ -127,8 +132,8 @@ class Level(commands.Cog):
                 return user == ctx.author
             reaction, user = await self.client.wait_for('reaction_add', check=check)
             await _msg.delete()
-    
-    
+            
+
     @commands.command(aliases=['levelupd', 'lvlupd'])
     async def levelupdisable(self, ctx, *args):
         if not args:
@@ -155,7 +160,7 @@ class Level(commands.Cog):
                 await ctx.send('Thông báo lên cấp đã bật sẵn. Tắt đi bằng lệnh `levelupdisable` nhé.')
         else:
             pass
-        
+
 
     @commands.command()
     @commands.is_owner()
@@ -169,7 +174,22 @@ class Level(commands.Cog):
           stats = levelling.find_one({"id": member.id})
           xp = stats["xp"] + xp_add
           levelling.update_one({"id":member.id}, {"$set":{"xp":xp}})
-          print(f'Added {xp_add} to user {member.id}')
+          await ctx.send(f'Added {xp_add} to user {member.id}')
+
+    
+    @commands.command()
+    @commands.is_owner()
+    async def supxp(self, ctx, member:typing.Optional[discord.Member]=None, *, xp_sup=0):
+        if not member:
+          pass
+        elif not xp_sup:
+          pass
+        else:
+          print(member.id)
+          stats = levelling.find_one({"id": member.id})
+          xp = stats["xp"] - xp_sup
+          levelling.update_one({"id":member.id}, {"$set":{"xp":xp}})
+          await ctx.send(f'Removed {xp_sup} exp from {member}')
 
 
 

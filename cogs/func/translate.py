@@ -1,11 +1,11 @@
-
+import random
 import re
 
 import discord
 from discord.ext import commands
 from googletrans import LANGCODES, LANGUAGES, Translator
 
-GOOGLE_TRANSLATE = 'Google'
+GOOGLE_TRANSLATE = ['Google bảo rằng', 'Dù sao thì', 'Cuộc đời này thật lắm éo le', 'Lời nói chẳng mất tiền mua', 'Được dịch bởi Guốc Le', 'Dù đúng dù sai']
 TRANSLATE_URL = 'https://translate.google.com/'
 INVALID_LANG_CODE = '`{}`: Không hỗ trợ ngôn ngữ này hoặc sai code language'
 NO_TEXT = 'Không có mẫu tin nào để chuyển'
@@ -14,6 +14,20 @@ SUPPORTED_LANGS = { 'auto': 'Automatic', **LANGUAGES, **LANGCODES}
 EMOJI_REGEX = '(<a*(:[^:\s]+:)\d+>)'
 CUSTOM_DICT = {
     'c0ldf1re': 'the best',
+    'trlz': 'thì ra là zậy',
+    'mctd': 'mọc CHÂN trên đầu',
+    'thr': 'toi hieu roi',
+    'tch': 'toi chua hieu',
+    'gumball': 'zyzy\'s',
+    'zyzy': 'gumball\'s',
+    'bomman': 'úi zời ơi dễ vãi L0L',
+    'minh nghi': 'ny ny',
+    '01i': 'không một ai, không ai cả, không ai muốn nghe, muốn hiểu tôi nói gì cả',
+    'trần dần': 'tiên tri vũ trụ vô địch',
+    'huấn rose': 'không nàm mà đòi có ăn thì có mà ăn đầu bò, ăn mứt',
+    'btd': 'bao thì đi',
+    'btđ': 'bao thì đi',
+    'kd': 'khùm đean'
 }
 
 translator = Translator()
@@ -60,14 +74,14 @@ def translate(src2dest, text):
     # translated = translator.translate(text, dest=dest, src=src)
     translator = Translator()
     print(text)
-    print(dest, src)
+    # print(dest, src)
     translated = translator.translate(text, dest=dest, src=src)
     translated_text = translated.text
     for word, meaning in CUSTOM_DICT.items():
         translated_text = translated_text.replace(word, meaning)
 
-    embed = discord.Embed(description=f'Trứng: {text}\nZịt: {translated_text}', color=discord.Color.random())
-    embed.set_author(name=GOOGLE_TRANSLATE, url=TRANSLATE_URL)
+    embed = discord.Embed(description=f'Từ: {text}\nCũng thành: {translated_text}', color=discord.Color.random())
+    embed.set_author(name=random.choice(GOOGLE_TRANSLATE), url=TRANSLATE_URL)
     embed.set_footer(text=f'Từ {translated.src} sang {translated.dest}')
 
     return embed

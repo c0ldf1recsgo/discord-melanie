@@ -11,8 +11,60 @@ def get_prefix():
         prefix = json.load(f)
     return prefix['prefix']
 
-prefix = get_prefix()
+def get_user_id():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['user_id']
 
+def get_user_name():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['user_name']
+
+def add_user(uid, uname):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['user_id'].append(str(uid))
+    prefix['user_name'].append(str(uname))
+
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def edit_user(uid, uname):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['user_name'][prefix['user_id'].index(uid)] = uname
+    # prefix['user_name'].append(str(uname))
+
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def get_bd():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['bd']
+
+def add_bd(idbd):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['bd'].append(idbd)
+
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def edit_bd(index, idbd):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['bd'][index] = idbd
+
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+prefix = get_prefix()
 class CMND(commands.Cog):
 
     def __init__(self, client):
@@ -26,8 +78,10 @@ class CMND(commands.Cog):
       if not args:
         print(ctx.author.id)
         print('sent all users')
-        id_list = db['user_id']
-        temp =  db['user_name']
+        # print(get_user_id())
+        # print(db['user_name'])
+        id_list = get_user_id()
+        temp =  get_user_name()
         list_name = temp[1:]
         n=15
         b = [list_name[i*n : (i+1)*n] for i in range((len(list_name) + n - 1) // n)]
@@ -80,8 +134,8 @@ class CMND(commands.Cog):
       if ctx.author == self.client.user:
         return
       print(ctx.author.id)
-      list_id = db['user_id']
-      list_name = db['user_name']
+      list_id = get_user_id()
+      # list_name = get_user_name()
       # print(list(zip(list_id, list_name)))
       if (str(ctx.author.id) == '394520281814925313'):
         await ctx.send(
@@ -97,10 +151,11 @@ class CMND(commands.Cog):
             
         else:
           name = ' '.join(args)
-          list_id.append(str(ctx.author.id))
-          list_name.append(name)
-          db['user_id'] = list_id
-          db['user_name'] = list_name
+          add_user(str(ctx.author.id), name)
+          # list_id.append(str(ctx.author.id))
+          # list_name.append(name)
+          # db['user_id'] = list_id
+          # db['user_name'] = list_name
           print('dang ky cmnd thanh cong')
           await ctx.send('Đăng kí CMND thành công <3')
       print('dang ky cmnd')
@@ -112,8 +167,8 @@ class CMND(commands.Cog):
       if ctx.author == self.client.user:
         return
       print(ctx.author.id)
-      list_id = db['user_id']
-      list_name = db['user_name']
+      list_id = get_user_id()
+      # list_name = get_user_name()
       # print(list(zip(list_id, list_name)))
       if (str(ctx.author.id) not in list_id):
         await ctx.send(
@@ -124,9 +179,10 @@ class CMND(commands.Cog):
           await ctx.send('Nhập thêm tên mà bạn muốn tôi gọi vào sau cú pháp `{0}cmndedit` bạn nhé'.format(prefix))
         else:
           name = ' '.join(args)
-          list_name[list_id.index(str(ctx.author.id))] = name
-          db['user_id'] = list_id
-          db['user_name'] = list_name
+          # list_name[list_id.index(str(ctx.author.id))] = name
+          # db['user_id'] = list_id
+          # db['user_name'] = list_name
+          edit_user(str(ctx.author.id), name)
           print('thay doi cmnd thanh cong')
           await ctx.send(f'Đã sửa đổi tên CMND sang {name}')
 
@@ -134,7 +190,8 @@ class CMND(commands.Cog):
     @commands.command(aliases=['bd'])
     async def birthday(self, ctx, *args):
       print(ctx.author.id)
-      allab = db['bd']
+      # print(db['bd'])
+      allab = get_bd()
       a = []
       b = []
       for i in allab:
@@ -150,15 +207,16 @@ class CMND(commands.Cog):
         try:
           datetime_object = datetime.strptime(mess, '%d/%m')
           bd = datetime_object.strftime('%d/%m')
+          add_bd(str(ctx.author.id) + ' - ' + bd)
           allab.append(str(ctx.author.id) + ' - ' + bd)
-          db['bd'] = allab
+          # db['bd'] = allab
           await ctx.send("Đăng ký sinh nhật thành công.")
         except:
           if '29' in mess and '02' in mess:
             datetime_object = datetime.strptime('29/02/2012', '%d/%m/%Y')
             bd = datetime_object.strftime('%d/%m')
             allab.append(str(ctx.author.id) + ' - ' + bd)
-            db['bd'] = allab
+            add_bd(str(ctx.author.id) + ' - ' + bd)
             await ctx.send("Đăng ký sinh nhật thành công.")
           else:
             await ctx.send("Sai cú pháp. Vui lòng đăng ký theo lệnh: `{0}birthday` `dd/mm` bạn nhé.".format(prefix))
@@ -168,7 +226,7 @@ class CMND(commands.Cog):
     @commands.command(aliases=['bde', 'bdedit'])
     async def birthdayedit(self, ctx, *args):
       print(ctx.author.id)
-      allab = db['bd']
+      allab = get_bd()
       a = []
       b = []
       for i in allab:
@@ -187,7 +245,7 @@ class CMND(commands.Cog):
             index = a.index(str(ctx.author.id))
             b[index] = bd
             allab[index] = str(ctx.author.id) + ' - ' + bd
-            db['bd'] = allab
+            edit_bd(index, str(ctx.author.id) + ' - ' + bd)
             await ctx.send("Sửa đổi sinh nhật thành công.")
           except:
             if '29' in mess and '02' in mess:
@@ -196,7 +254,7 @@ class CMND(commands.Cog):
               index = a.index(str(ctx.author.id))
               b[index] = bd
               allab[index] = str(ctx.author.id) + ' - ' + bd
-              db['bd'] = allab
+              edit_bd(index, str(ctx.author.id) + ' - ' + bd)
               await ctx.send("Sửa đổi sinh nhật thành công.")
             else:
               await ctx.send("Sai cú pháp. Vui lòng đăng ký theo lệnh: `{0}birthdayedit` `dd/mm` bạn nhé.".format(prefix))
@@ -209,9 +267,9 @@ class CMND(commands.Cog):
       print(ctx.author.id)
       print('sent whos')
 
-      list_id = db['user_id']
-      list_name = db['user_name']
-      allab = db['bd']
+      list_id = get_user_id()
+      list_name = get_user_name()
+      allab = get_bd()
       a = []
       b = []
       for i in allab:

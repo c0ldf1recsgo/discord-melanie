@@ -1,5 +1,5 @@
 # pylint: disable=relative-beyond-top-level
-# Inspired by https://github.com/DleanJeans
+# Inspired by https://github.com/DleanJean
 
 import typing
 import io
@@ -151,6 +151,8 @@ class Spy(commands.Cog):
             prev_msg = m
         
         if msgs:
+            
+
             embed.description = '\n'.join(msgs)
 
     def get_or_create_log(self, channel):

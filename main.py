@@ -1,14 +1,17 @@
 import os
 from dotenv import load_dotenv
 from alive import alive
+import json
 
-from replit import db
+# from replit import db
 
 import discord
 from discord.ext import commands
 
 def get_prefix(client, message):
-    return db['prefix'][0]
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['prefix']
 
 intents = discord.Intents().all()
 client = discord.Client()
@@ -19,5 +22,5 @@ for filename in os.listdir('./cogs'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
 load_dotenv()
-alive()
+# alive()
 client.run(os.getenv('TOKEN'))

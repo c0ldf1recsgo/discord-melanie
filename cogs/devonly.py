@@ -21,9 +21,9 @@ class Dev(commands.Cog):
         if (str(ctx.author.id) == '394520281814925313'):
           await ctx.message.delete()
           embedVar = discord.Embed(
-                title="UPDATE MELANIE version 1.3.2a",
+                title="BIG UPDATE MELANIE version 2.0",
                 description=
-                "**LEVEL UP NOTIFICATIONS**\nHey!!, if the level-up notification does annoy you, just type `{0}levelupdisable` to turn it off and `{0}levelupenable` to turn it on again.\n\nBTW, this update includes the changes in the way to use `help` command. Check `{0}help` to understand.\nMore feature will be added soon.\n\n**Enjoy and Have a nice day. Love y'all.**".format(get_prefix()),
+                "**FINALLY**\nActually there is no new feature.\n\nBut hey!! Melanie is now have a new home with Herokuapp. Say goodbye to trash Replit. :)", 
                 color=0x03fcfc)
           await ctx.channel.send(embed = embedVar)
 

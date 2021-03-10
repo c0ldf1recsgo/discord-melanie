@@ -1,13 +1,56 @@
 # pylint: disable=relative-beyond-top-level
 import random
 import asyncio
-
-from replit import db
+import json
 
 import discord
 from discord import DMChannel
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
+
+def get_prefix():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['prefix']
+
+def get_bjs():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['bjs']
+
+def change_bjs(status):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['bjs'][0] = status   
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def get_loto():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['loto']
+
+def get_lotos():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['lotos']
+
+def change_lotos(status):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['lotos'] = status   
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def create_loto(nums):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['loto'] = nums  
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
 
 def create_desk():
   cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
@@ -19,12 +62,32 @@ def create_desk():
   random.shuffle(desk)
   return desk
 
-prefix = db['prefix'][0]
+def get_lotoc():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['lotoc']
+
+def add_lotoc(num):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['lotoc'].append(num)
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+def change_lotoc(nums):
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+
+    prefix['lotoc'] = nums
+    with open('./cogs/prefixes.json', 'w') as f:
+        json.dump(prefix, f, indent=4)
+
+prefix = get_prefix()
 players = []
 desk = []
 cards = []
 turn = 0
-
 class Talk(commands.Cog):
 
     def __init__(self, client):
@@ -135,11 +198,12 @@ class Talk(commands.Cog):
       print('bj join')
       global players
       if str(ctx.author.id) not in players:
-        status = db['bjs'][0]
+        status = get_bjs()[0]
         if status == 'end' or status == 'lobby':
           pid = str(ctx.author.id)
           status = 'lobby'
-          db['bjs'] = [status]
+          change_bjs(status)
+          # db['bjs'] = [status]
           players.append(pid)
           await ctx.channel.send('<@!' + pid + '> vừa tham gia.')
         else:
@@ -157,7 +221,7 @@ class Talk(commands.Cog):
       print('bj unjoin')
       global players
       if str(ctx.author.id) in players:
-        status = db['bjs'][0]
+        status = get_bjs()[0]
         if status == 'lobby':
           pid = str(ctx.author.id)
           players.remove(pid)
@@ -179,10 +243,10 @@ class Talk(commands.Cog):
       if str(ctx.author.id) not in players:
         await ctx.channel.send('Bạn không có trong danh sách người chơi nên không thể bắt đầu trò chơi.')
         return
-      status = db['bjs'][0]
+      status = get_bjs()[0]
       if status == 'lobby':
         status = 'start'
-        db['bjs'] = [status]
+        change_bjs(status)
         global desk
         desk = create_desk()
         for i in range(len(players)):
@@ -218,7 +282,7 @@ class Talk(commands.Cog):
       if str(ctx.author.id) not in players:
         await ctx.channel.send('Bạn không có trong danh sách người chơi nên không thể bốc bài.')
         return
-      status = db['bjs'][0]
+      status = get_bjs()[0]
       if status == 'start' and str(ctx.author.id) == players[turn]:
         cards[turn].append(desk.pop())
         c = ''
@@ -242,7 +306,7 @@ class Talk(commands.Cog):
       if str(ctx.author.id) not in players:
         await ctx.channel.send('Bạn không có trong danh sách người chơi nên không thể làm gì.')
         return
-      status = db['bjs'][0]
+      status = get_bjs()[0]
       global turn
       global cards
       if status == 'start' and str(ctx.author.id) == players[turn]:
@@ -262,7 +326,7 @@ class Talk(commands.Cog):
           desk = []
           turn = 0
           status = 'lobby'
-          db['bjs'] = [status]
+          change_bjs(status)
           await ctx.channel.send('Ván đấu đã được tạo lại, có thể tham gia thêm.')
         else:
           user = await self.client.fetch_user(players[turn])
@@ -285,7 +349,7 @@ class Talk(commands.Cog):
       if str(ctx.author.id) not in players:
         await ctx.channel.send('Bạn không có trong danh sách người chơi nên không thể phá đâu nhé.')
         return
-      status = db['bjs'][0]
+      status = get_bjs()[0]
       if status == 'start':
         global cards
         global desk
@@ -294,7 +358,7 @@ class Talk(commands.Cog):
         desk = []
         turn = 0
         status = 'lobby'
-        db['bjs'] = [status]
+        change_bjs(status)
         await ctx.channel.send('Ván đấu đã được tạo lại, có thể tham gia thêm.')
       else:
         await ctx.channel.send('Bắt đầu game trước khi restart nó nhé.')
@@ -314,14 +378,14 @@ class Talk(commands.Cog):
       if str(ctx.author.id) not in players:
         await ctx.channel.send('Bạn không có trong danh sách người chơi nên không thể phá đâu nhé.')
         return
-      status = db['bjs'][0]
+      status = get_bjs()[0]
       if status == 'lobby':
         players = []
         cards = []
         desk = []
         turn = 0
         status = 'end'
-        db['bjs'] = [status]
+        change_bjs(status)
         await ctx.channel.send('Trò chơi đã kết thúc hoàn toàn.')
       else:
         await ctx.channel.send('Kết thúc ván đấu trước khi kết thúc trò chơi nhé.')
@@ -368,13 +432,15 @@ class Talk(commands.Cog):
         await ctx.channel.send('Không thể dùng lệnh ở channel này.')
       else:
         if not args:
-          started = db['lotos'][0]
-          if started == False:
+          started = get_lotos()
+          
+          if started == 0:
             nums = [*range(1, 91, 1)]
             random.shuffle(nums)
-            db['loto'] = nums
-            started = True
-            db['lotos'] = [started]
+            # db['loto'] = nums
+            create_loto(nums)
+            started = 1
+            change_lotos(started)
             await ctx.channel.send('Trò chơi bắt đầu')
           else:
             await ctx.channel.send('Trò chơi đã bắt đầu rồi.')
@@ -389,16 +455,14 @@ class Talk(commands.Cog):
         await ctx.channel.send('Không thể dùng lệnh ở channel này.')
       else:
         if not args:
-          started = db['lotos'][0]
-          if started == False:
+          started = get_lotos()
+          if started == 0:
             await ctx.channel.send('Vui lòng bắt đầu game bằng lệnh `{0}lotostart` trước.'.format(prefix))
           else:
-            nums = db['loto']
-            added = db['lotoc']
+            nums = get_loto()
             index = nums.pop()
-            added.append(index)
-            db['lotoc'] = added
-            db['loto'] = nums
+            add_lotoc(index)
+            create_loto(nums)
             await ctx.channel.send('**' + str(index) + '**')
       print('loto random')
 
@@ -415,12 +479,12 @@ class Talk(commands.Cog):
         elif len(args) < 5 or len(args) > 5:
           await ctx.channel.send('Vui lòng nhập đủ 5 số.')
         else:
-          started = db['lotos'][0]
-          if started == False:
+          started = get_lotos()
+          if started == 0:
             await ctx.channel.send('Trò chơi chưa được bắt đầu, hãy bắt đầu game bằng lệnh `{0}lotostart` trước'.format(prefix))
           else:
             done = False
-            nums = db['lotoc']
+            nums = get_lotoc()
             print(nums)
             print(args)
             try:
@@ -447,13 +511,13 @@ class Talk(commands.Cog):
         await ctx.channel.send('Không thể dùng lệnh ở channel này.')
       else:
         if not args:
-          started = db['lotos'][0]
-          if started == False:
+          started = get_lotos()
+          if started == 0:
             await ctx.channel.send('Trò chơi chưa được bắt đầu, hãy bắt đầu game bằng lệnh `{0}lotostart` trước'.format(prefix))
           else:
-            db['lotoc'] = []
-            started = False
-            db['lotos'] = [started]
+            change_lotoc([])
+            started = 0
+            change_lotos(started)
             await ctx.channel.send('Trò chơi đã được kết thúc')
       print('loto ended')
 
@@ -466,11 +530,11 @@ class Talk(commands.Cog):
         await ctx.channel.send('Không thể dùng lệnh ở channel này.')
       else:
         if not args:
-          started = db['lotos'][0]
-          if started == False:
+          started = get_lotos()
+          if started == 0:
             await ctx.channel.send('Trò chơi chưa được bắt đầu, hãy bắt đầu game bằng lệnh `{0}lotostart` trước'.format(prefix))
           else:
-            nums = db['lotoc']
+            nums = get_lotoc()
             await ctx.channel.send(nums)
             await ctx.channel.send('\nTổng cộng có: {0} lần quay'.format(len(nums)))
 

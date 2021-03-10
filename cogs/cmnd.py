@@ -1,13 +1,18 @@
 from typing import Optional
 from datetime import datetime
-
-from replit import db
+import json
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
 
-prefix = db['prefix'][0]
+def get_prefix():
+    with open('./cogs/prefixes.json', 'r') as f:
+        prefix = json.load(f)
+    return prefix['prefix']
+
+prefix = get_prefix()
+
 class CMND(commands.Cog):
 
     def __init__(self, client):

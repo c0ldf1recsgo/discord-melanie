@@ -52,7 +52,7 @@ def get_girl_image():
   #   ind = random.randrange(2,206)
   # elif 'c0ldf1recsgo' in selection:
   #   ind = random.randrange(2,240)
-  ind = random.randrange(2,249)
+  ind = random.randrange(2,315)
   url = ('https://api.tumblr.com/v2/blog/c0ldf1recsgo.tumblr.com/posts?api_key=' + key + '&type=photo&limit=1&offset={0}').format(str(ind))
   print(url)
   reponse = requests.get(url)

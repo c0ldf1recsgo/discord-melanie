@@ -117,13 +117,21 @@ class Image(commands.Cog):
         if ctx.author == self.client.user:
             return
         if not args:
-            print(ctx.author.id)
-            xinh = get_girl_image()
-            embedVar = discord.Embed(description=" ", color=0xd14949)
-            embedVar.set_author(name=ctx.author.display_name + " thích ngắm gái", icon_url=ctx.author.avatar_url)
-            embedVar.set_image(url=xinh)
-            await ctx.channel.send(embed=embedVar)
-            print('gai xinh')
+            i = random.randrange(0,3)
+            if i == 2:
+                print(ctx.author.id)
+                embedVar = discord.Embed(description="Nhưng không có cô gái nào xuất hiện cả.", color=0xd14949)
+                embedVar.set_author(name=ctx.author.display_name + " thích ngắm gái", icon_url=ctx.author.avatar_url)
+                await ctx.channel.send(embed=embedVar)
+                print('gai xinh')
+            else:
+                print(ctx.author.id)
+                xinh = get_girl_image()
+                embedVar = discord.Embed(description=" ", color=0xd14949)
+                embedVar.set_author(name=ctx.author.display_name + " thích ngắm gái", icon_url=ctx.author.avatar_url)
+                embedVar.set_image(url=xinh)
+                await ctx.channel.send(embed=embedVar)
+                print('gai xinh')
 
 
     @commands.command(aliases=['man', 'handsome', 'boy', 'zai'])
@@ -133,11 +141,11 @@ class Image(commands.Cog):
             return
         if not args:
             print(ctx.author.id)
-            xinh = get_boy_image()
+            # xinh = get_boy_image()
             # print(xinh)
-            embedVar = discord.Embed(description=" ", color=0xd14949)
+            embedVar = discord.Embed(description="Xin lỗi nhưng chẳng có chàng trai nào cho bạn đâu.", color=0xd14949)
             embedVar.set_author(name=ctx.author.display_name + " thích ngắm zai :\\", icon_url=ctx.author.avatar_url)
-            embedVar.set_image(url=xinh)
+            # embedVar.set_image(url=xinh)
             await ctx.channel.send(embed=embedVar)
             print('trai dep')
 

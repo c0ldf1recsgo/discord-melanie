@@ -1,12 +1,18 @@
-import json
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound, CommandOnCooldown
 
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://blah-blah-blah")
+
+db = cluster['discord']['data']
+
 def get_prefix():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['prefix']
+    prefixid = db.find_one({"id": 'prefix'})
+    prefix = prefixid['value']
+    return prefix
 
 class Start(commands.Cog):
 
@@ -16,7 +22,7 @@ class Start(commands.Cog):
     # Events
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.client.change_presence(status=discord.Status.idle, activity=discord.Game( get_prefix() + 'help !!!'))
+        await self.client.change_presence(status=discord.Status.idle, activity=discord.Game( get_prefix()[0] + 'help !!!'))
         print('Bot is ready to go as {0.user}'.format(self.client))
 
     @commands.Cog.listener()
@@ -26,7 +32,7 @@ class Start(commands.Cog):
         elif isinstance(error, commands.NotOwner):
             return
         elif isinstance(error, CommandOnCooldown):
-            await ctx.send('Vui lòng chờ một chút rồi mới được nhập lại lệnh này.', delete_after=4)
+            await ctx.send(':woman_gesturing_no: Bình tĩnh nào, đừng spam như thế chứ.', delete_after=4)
             return
         raise error
 

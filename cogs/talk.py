@@ -6,66 +6,67 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
 
-def get_userid():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['user_id']
+from pymongo import MongoClient
 
-def get_username():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['user_name']
+cluster = MongoClient("mongodb+srv://blah-blah-blah")
+
+db = cluster['discord']['data']
 
 def get_prefix():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['prefix']
+    prefixid = db.find_one({"id": 'prefix'})
+    prefix = prefixid['value']
+    return prefix
+
+def get_userid():
+    useridid = db.find_one({"id": 'user_id'})
+    userid = useridid['value']
+    return userid
+
+def get_username():
+    usernameid = db.find_one({"id": 'user_name'})
+    username = usernameid['value']
+    return username
+
 
 def get_chuc():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['cau_chuc']
+    cau_chuc_id = db.find_one({"id": 'cau_chuc'})
+    cau_chuc = cau_chuc_id['value']
+    return cau_chuc
 
 def get_tru():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['cau_tru']
+    cau_tru_id = db.find_one({"id": 'cau_tru'})
+    cau_tru = cau_tru_id['value']
+    return cau_tru
 
 def update_cau_chuc(cau_chuc_message):
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    
-    prefix['cau_chuc'].append(cau_chuc_message)
-    with open('./cogs/prefixes.json', 'r') as f:
-        json.dumb(prefix, f, indent=4)
+    cau_chuc_id = db.find_one({"id": 'cau_chuc'})
+    cau_chuc = cau_chuc_id['value']
+    cau_chuc.append(cau_chuc_message)
+
+    db.update_one({"id":'cau_chuc'}, {"$set":{"value":cau_chuc}})
 
 def delete_cau_chuc(index):
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    
-    if len(prefix['cau_chuc']) >= index:
-        del prefix['cau_chuc'][index - 1]
-    with open('./cogs/prefixes.json', 'r') as f:
-        json.dumb(prefix, f, indent=4)
+    cau_chuc_id = db.find_one({"id": 'cau_chuc'})
+    cau_chuc = cau_chuc_id['value']
+    if len(cau_chuc) >= index:
+      del cau_chuc[index - 1]
+    db.update_one({"id":'cau_chuc'}, {"$set":{"value":cau_chuc}})
 
 def update_cau_tru(cau_tru_message):
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    
-    prefix['cau_tru'].append(cau_tru_message)
-    with open('./cogs/prefixes.json', 'r') as f:
-        json.dumb(prefix, f, indent=4)
+    cau_tru_id = db.find_one({"id": 'cau_tru'})
+    cau_tru = cau_tru_id['value']
+    cau_tru.append(cau_tru_message)
+
+    db.update_one({"id":'cau_tru'}, {"$set":{"value":cau_tru}})
 
 def delete_cau_tru(index):
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    
-    if len(prefix['cau_tru']) >= index:
-        del prefix['cau_tru'][index - 1]
-    with open('./cogs/prefixes.json', 'r') as f:
-        json.dumb(prefix, f, indent=4)
+    cau_tru_id = db.find_one({"id": 'cau_tru'})
+    cau_tru = cau_tru_id['value']
+    if len(cau_tru) >= index:
+      del cau_tru[index - 1]
+    db.update_one({"id":'cau_tru'}, {"$set":{"value":cau_tru}})
 
-prefix = get_prefix()
+prefix = get_prefix()[0]
 class Talk(commands.Cog):
 
     def __init__(self, client):
@@ -228,9 +229,10 @@ class Talk(commands.Cog):
         messages = await ctx.channel.send(embed = pages[0])
         await messages.add_reaction('◀')
         await messages.add_reaction('▶')
-
+        await messages.add_reaction("🗑️")
+        
         def check(reaction, user):
-          return user == ctx.author
+          return user == ctx.author and reaction.message == messages
 
         i = 0
         reaction = None
@@ -244,6 +246,8 @@ class Talk(commands.Cog):
             if i < (len(pages) - 1):
               i += 1
               await messages.edit(embed = pages[i])
+          elif str(reaction) == '🗑️':
+            await messages.delete()
           else:
             pass
           
@@ -291,9 +295,10 @@ class Talk(commands.Cog):
         messages = await ctx.channel.send(embed = pages[0])
         await messages.add_reaction('◀')
         await messages.add_reaction('▶')
+        await messages.add_reaction("🗑️")
 
         def check(reaction, user):
-          return user == ctx.author
+          return user == ctx.author and reaction.message == messages
 
         i = 0
         reaction = None
@@ -307,6 +312,8 @@ class Talk(commands.Cog):
             if i < (len(pages) - 1):
               i += 1
               await messages.edit(embed = pages[i])
+          elif str(reaction) == '🗑️':
+            await messages.delete()
           else:
             pass
           

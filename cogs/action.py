@@ -46,15 +46,51 @@ def get_hug():
 
 
 def get_pat():
-  key = os.getenv('TENOR_KEY')
-  url = 'https://api.tenor.com/v1/random?key=' + key + '&q=anime-pat&media_filter=minimal&limit=1&pos={0}'
-  offset = random.randrange(1,120)
-  URL = url.format(offset)
-  reponse = requests.get(URL)
-  json_data = json.loads(reponse.text)
-  result = json_data['results'][0]['media'][0]['gif']['url']
-  
-  return result
+    key = os.getenv('TENOR_KEY')
+    url = 'https://api.tenor.com/v1/random?key=' + key + '&q=anime-pat&media_filter=minimal&limit=1&pos={0}'
+    offset = random.randrange(1,120)
+    URL = url.format(offset)
+    reponse = requests.get(URL)
+    json_data = json.loads(reponse.text)
+    result = json_data['results'][0]['media'][0]['gif']['url']
+    
+    return result
+
+
+def get_lick():
+    key = os.getenv('TENOR_KEY')
+    url = 'https://api.tenor.com/v1/random?key=' + key + '&q=anime-lick&media_filter=minimal&limit=1&pos={0}'
+    offset = random.randrange(1,50)
+    URL = url.format(offset)
+    reponse = requests.get(URL)
+    json_data = json.loads(reponse.text)
+    result = json_data['results'][0]['media'][0]['gif']['url']
+    
+    return result
+
+
+def get_kill():
+    key = os.getenv('TENOR_KEY')
+    url = 'https://api.tenor.com/v1/random?key=' + key + '&q=anime-ounch&media_filter=minimal&limit=1&pos={0}'
+    offset = random.randrange(1,100)
+    URL = url.format(offset)
+    reponse = requests.get(URL)
+    json_data = json.loads(reponse.text)
+    result = json_data['results'][0]['media'][0]['gif']['url']
+    
+    return result
+
+
+def get_poke():
+    key = os.getenv('TENOR_KEY')
+    url = 'https://api.tenor.com/v1/random?key=' + key + '&q=anime-poke&media_filter=minimal&limit=1&pos={0}'
+    offset = random.randrange(1,80)
+    URL = url.format(offset)
+    reponse = requests.get(URL)
+    json_data = json.loads(reponse.text)
+    result = json_data['results'][0]['media'][0]['gif']['url']
+    
+    return result
 
 class Action(commands.Cog):
 
@@ -203,6 +239,112 @@ class Action(commands.Cog):
             print('sent pat')
         else:
             await ctx.channel.send('Sai cú pháp')
+
+
+    @commands.command()
+    @cooldown(1, 3, BucketType.user)
+    async def lick(self, ctx, *args):
+        if ctx.author == self.client.user:
+            return
+        if not args:
+            print(ctx.author.id)
+            gif = get_lick()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " mlem cả mọi người <3", icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent lick')
+        elif ('<@!' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][3:-1])
+            gif = get_lick()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " mlem " + (str(taggered))[:-5] + '! Mmmmm !!', icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent lick')
+        elif ('<@' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][2:-1])
+            gif = get_lick()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " mlem " + (str(taggered))[:-5] + '! Mmmmm !!', icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent lick')
+        else:
+            await ctx.channel.send('Sai cú pháp')
+
+
+    @commands.command()
+    @cooldown(1, 3, BucketType.user)
+    async def kill(self, ctx, *args):
+        if ctx.author == self.client.user:
+            return
+        if not args:
+            print(ctx.author.id)
+            gif = get_kill()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " xóa sổ server ", icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent kill')
+        elif ('<@!' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][3:-1])
+            gif = get_kill()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " giết trết " + (str(taggered))[:-5], icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent kill')
+        elif ('<@' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][2:-1])
+            gif = get_kill()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " giết trết " + (str(taggered))[:-5], icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent kill')
+        else:
+            await ctx.channel.send('Sai cú pháp')
+
+
+    @commands.command()
+    @cooldown(1, 3, BucketType.user)
+    async def poke(self, ctx, *args):
+        if ctx.author == self.client.user:
+            return
+        if not args:
+            print(ctx.author.id)
+            gif = get_poke()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " chọt chọt ", icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent poke')
+        elif ('<@!' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][3:-1])
+            gif = get_poke()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " chọt " + (str(taggered))[:-5] + " ! Awwww", icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent poke')
+        elif ('<@' in args[0]) and '>' in args[0]:
+            print(ctx.author.id)
+            taggered = await self.client.fetch_user(args[0][2:-1])
+            gif = get_poke()
+            embedVar = discord.Embed(description=" ", color=0xffff00)
+            embedVar.set_author(name=ctx.author.display_name + " chọt " + (str(taggered))[:-5] + " ! Awwww", icon_url=ctx.author.avatar_url)
+            embedVar.set_image(url=gif)
+            await ctx.channel.send(embed=embedVar)
+            print('sent poke')
+        else:
+            await ctx.channel.send('Sai cú pháp')
+
 
 def setup(client):
     client.add_cog(Action(client))

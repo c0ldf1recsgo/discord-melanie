@@ -1,10 +1,16 @@
-# pylint: disable=relative-beyond-top-level
 import googletrans
 from typing import Optional
 
 from .func import translate
 
 from discord.ext import commands
+from discord.ext.commands import cooldown, BucketType
+
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://blah-blah-blah")
+
+collection = cluster['discord']['dict']
 
 BULLET = ' • '
 INVISIBLE = '‎'
@@ -15,14 +21,16 @@ class Trans(commands.Cog):
         self.client = client
         self.translator = googletrans.Translator()
 
-    @commands.command(aliases=['trans', 'tr', 'translate'])
-    async def translator(self, ctx, src2dest:Optional[translate.Src2Dest]='auto>vi', *, text=None):
+    @commands.command(aliases=['trans', 'tr'])
+    @cooldown(1, 5, BucketType.user)
+    async def translate(self, ctx, src2dest:Optional[translate.Src2Dest]='auto>hcmus', *, text=None):
         print(ctx.author.id, 'translate')
         if not text:
             last_message = await ctx.history(limit=1, before=ctx.message).flatten()
             text = last_message[0].clean_content or translate.NO_TEXT
         embed = translate.translate(src2dest, text)
         await ctx.send(embed=embed)
+
 
     @commands.command(aliases=['langs', 'tls'])
     async def translatelangs(self, ctx):
@@ -34,6 +42,26 @@ class Trans(commands.Cog):
             return user == ctx.author
         reaction, user = await self.client.wait_for('reaction_add', check=check)
         await msg.delete()
+
+
+    @commands.command(aliases=['addtr'])
+    @commands.is_owner()
+    async def addtrans(self, ctx, *args):
+        if len(args) < 1:
+            await ctx.send('No input arguments')
+            return
+        msg = ' '.join(args)
+        if ' | ' not in msg:
+            await ctx.send('Wrong input arguments')
+            return
+        key = msg.split(' | ')[0]
+        value = msg.split(' | ')[1]
+        db = collection.find_one({key: {"$exists": True}})
+        if db != None:
+            await ctx.send('Đã tồn tại')
+        else:
+            db = collection.update_one({"id":'dict'}, {"$set":{key:value}})
+            await ctx.send(f'Đã thêm **{key}**: {value}')
 
 def setup(client):
     client.add_cog(Trans(client))

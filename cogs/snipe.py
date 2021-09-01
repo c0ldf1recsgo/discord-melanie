@@ -1,4 +1,5 @@
 # pylint: disable=relative-beyond-top-level
+# pylint: disable=unused-variable
 # Inspired by https://github.com/DleanJean
 
 import typing
@@ -16,8 +17,8 @@ EDITED = 'edited'
 def get_extra(msg):
     extra = get_attachment_links(msg)
     for i in msg.embeds:
-        num = str(i+1) if len(msg.embeds) > 1 else ''
-        embed = f'[Embed{num}]'
+        num = str(i+1) if len(msg.embeds) > 1 else str(0)
+        embed = f'**[**{num}**]**'
         extra += [embed]
     return ' '.join(extra)
 
@@ -66,6 +67,9 @@ class Spy(commands.Cog):
     
     async def send_message_in_embed(self, ctx, channel, state, index):
         channel = channel or ctx.channel
+        if index > SAVE_LIMIT:
+            await ctx.send("Bạn chỉ snipe được tối đa 15 tin nhắn thôi nhó.")
+            return
         msg = self.get_last_message(channel, state, index)
 
         embed = self.create_empty_embed(channel, state)
@@ -74,9 +78,16 @@ class Spy(commands.Cog):
             await self.embed_message_log(embed, msg, state, channel)
             files = await self.get_backup_files(msg, embed)
 
-        await ctx.send(embed=embed, files=files)
+        mesg = await ctx.send(embed=embed, files=files)
+
         if msg and msg.embeds:
-            await ctx.send(embed=msg.embeds[0])
+            mesg = await ctx.send(embed=msg.embeds[0])
+
+        await mesg.add_reaction("🗑️")
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message == mesg
+        reaction, user = await self.client.wait_for('reaction_add', check=check)
+        await mesg.delete()
     
     def get_last_message(self, channel, state, index):
         log = self.channel_logs.get(channel.id)
@@ -97,9 +108,9 @@ class Spy(commands.Cog):
         embed.description = msg.content or msg.system_content or ''
         embed.timestamp = msg.created_at
         if state == 'deleted':
-          embed.set_footer(text=f'Đã xóa tại #{channel.name}')
+            embed.set_footer(text=f'Đã xóa tại #{channel.name}')
         else:
-          embed.set_footer(text=f'Đã sửa tại #{channel.name}')
+            embed.set_footer(text=f'Đã sửa tại #{channel.name}')
         
         if not msg.attachments: return
 
@@ -125,7 +136,13 @@ class Spy(commands.Cog):
         embed = self.create_empty_embed(channel, state)
         self.embed_channel_logs(embed, log, state)
 
-        await ctx.send(embed=embed)
+        mesg = await ctx.send(embed=embed)
+
+        await mesg.add_reaction("🗑️")
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message == mesg
+        reaction, user = await self.client.wait_for('reaction_add', check=check)
+        await mesg.delete()
 
     def embed_channel_logs(self, embed, channel_log, state):
         if not channel_log: return
@@ -140,12 +157,16 @@ class Spy(commands.Cog):
 
             # snipe_index = min(len(logged_msgs), 10) - i
             # msg = f'**{snipe_index}:** {msg}'
-            msg = f'`{time}` {m.content} {extra}'
+            if len(m.content) > 1024:
+                msg = f'`{time}`: {m.content[:15]} ..... {m.content[-15:]} {extra}'
+            else:
+                msg = f'`{time}`: {m.content} {extra}'
             author_first_msg = not prev_msg or prev_msg.author != m.author
             if author_first_msg:
-                next_msg_same_author = i + 1 < len(logged_msgs) and logged_msgs[i+1].author == m.author
-                sep = '\n' if next_msg_same_author else ' '
-                msg = f'{m.author.mention}{sep}{msg}'
+                # next_msg_same_author = i + 1 < len(logged_msgs) and logged_msgs[i+1].author == m.author
+                # sep = '\n' if next_msg_same_author else ' '
+                # msg = f'{m.author.mention}{sep}{msg}'
+                msg = f'{m.author.mention}\n{msg}'
             msgs += [msg]
 
             prev_msg = m
@@ -168,9 +189,15 @@ class Spy(commands.Cog):
         channel = channel or ctx.channel
         msg = self.get_last_message(channel, EDITED, i)
         if msg:
-            await ctx.send(msg.content, embed=msg.embeds[0] if msg.embeds else None)
+            mesg = await ctx.send(msg.content, embed=msg.embeds[0] if msg.embeds else None)
         else:
-            await ctx.send(embed=self.create_empty_embed(channel, EDITED))
+            mesg = await ctx.send(embed=self.create_empty_embed(channel, EDITED))
+
+        await mesg.add_reaction("🗑️")
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message == mesg
+        reaction, user = await self.client.wait_for('reaction_add', check=check)
+        await mesg.delete()
     
     @commands.command(aliases=['spy'])
     @commands.guild_only()

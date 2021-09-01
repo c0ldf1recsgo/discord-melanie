@@ -1,21 +1,27 @@
 import os
 from dotenv import load_dotenv
-from alive import alive
-import json
-
-# from replit import db
+# from alive import alive
+# import json
 
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand
+
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://melanie:c0ldf1re@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+
+db = cluster['discord']['data']
 
 def get_prefix(client, message):
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['prefix']
+    prefixid = db.find_one({"id": 'prefix'})
+    prefix = prefixid['value']
+    return prefix
 
 intents = discord.Intents().all()
 client = discord.Client()
 client = commands.Bot(command_prefix = get_prefix, help_command=None, intents=intents)
+slash = SlashCommand(client, sync_commands=True)
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):

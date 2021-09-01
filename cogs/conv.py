@@ -9,7 +9,7 @@ import urllib.request as r
 
 from pymongo import MongoClient
 
-cluster = MongoClient("mongodb+srv://melanie:c0ldf1re@bot.bvo7z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = MongoClient("mongodb+srv://blah-blah-blah")
 
 db = cluster['discord']['data']
 

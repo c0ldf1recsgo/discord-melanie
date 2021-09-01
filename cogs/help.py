@@ -1,13 +1,21 @@
+# pylint: disable=unused-variable
+
 import json
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType
 
+from pymongo import MongoClient
+
+cluster = MongoClient("mongodb+srv://blah-blah-blah")
+
+db = cluster['discord']['data']
+
 def get_prefix():
-    with open('./cogs/prefixes.json', 'r') as f:
-        prefix = json.load(f)
-    return prefix['prefix']
+    prefixid = db.find_one({"id": 'prefix'})
+    prefix = prefixid['value']
+    return prefix
 
 class Help(commands.Cog):
 
@@ -20,7 +28,7 @@ class Help(commands.Cog):
     @commands.command()
     @cooldown(1, 1, BucketType.user)
     async def help(self, ctx, *args):
-        prefix = get_prefix()
+        prefix = get_prefix()[0]
         if ctx.author == self.client.user:
             return
         print(ctx.author.id)
@@ -33,21 +41,21 @@ class Help(commands.Cog):
             .format(prefix),
             color=0x00ff00)
             embedVar.add_field(
-            name=":slight_smile: Chào, an ủi, trù ẻo", value="`hi`, `hello` | `sad`, `huhu` | `vui`, `haha`", inline=False)
+            name=":slight_smile: Giao tiếp", value="`hi`, `hello` | `sad`, `huhu` | `vui`, `haha`", inline=False)
             embedVar.add_field(
             name=":game_die: Trò chơi",
-            value="`8ball`, `random`, `guess`, `loto`, `blackjack`",
+            value="`8ball`, `random`, `guess`, ~~`loto`~~, ~~`blackjack`~~",
             inline=False)
             embedVar.add_field(
-            name=":credit_card: Chứng minh nhân dân", value="`cmnd`, `birthday`, `who`", inline=False)
+            name=":credit_card: Chứng minh nhân dân", value="`cmnd`, `birthday`, `who`, `hpbd`", inline=False)
             embedVar.add_field(
-            name=":camera: Xem ảnh trai/gái hoặc đồ ăn", value="`boy`, `girl`, `food`", inline=False)
+            name=":camera: Xem ảnh", value="`boy`, `girl`, `food`, `iphone`, `ipad`, `image`", inline=False)
             embedVar.add_field(
-            name=":hugging: Hành động", value="`slap`, `kiss`, `hug`, `pat`", inline=False)
+            name=":hugging: Hành động", value="`slap`, `kiss`, `hug`, `pat`, `lick`, `kill`, `poke`", inline=False)
             embedVar.add_field(
-            name=":clown: Misc", value="`avatar`, `snipe`, `quote`, `math`, `currency`, `translate`", inline=False)
+            name=":clown: Misc", value="`avatar`, `snipe`, `quote`, `math`, `currency`, `translate`, `weather`, `google`, `color`, `ship`", inline=False)
             embedVar.add_field(
-            name=":wrench: Settings", value="`ping`, `prefix`, `nickname`", inline=False)
+            name=":wrench: Cài đặt", value="`ping`, `prefix`, `nickname`", inline=False)
             embedVar.add_field(
             name=":military_medal: Levels and ranking", value="`level`, `lvl` | `leaderboard`, `rank`", inline=False)
             msg = await ctx.channel.send(embed=embedVar)
@@ -105,7 +113,7 @@ class Help(commands.Cog):
             description="Đăng ký ngày sinh để được chúc mừng vào ngày sinh nhật nhé :heart:. Dùng lệnh `{0}birthday [dd/mm]`.\nAliases: `bd`\n- Kiểm tra xem mình đã đăng ký sinh nhật chưa: `{0}birthday`\nAliases: `bd`\n- Sửa sinh nhật: `{0}birthdayedit [dd/mm]`\nAliases: `bde`, `bdedit`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
-        elif args[0] in ['bd', 'birthday', 'bde', 'bdedit', 'birthdayedit']:
+        elif args[0] in ['who', 'whos', 'whois', 'info']:
             embedVar = discord.Embed(
             title="Thông tin cá nhân:",
             description="Xem thông tin cá nhân: `{0}who`. Có thể thêm @tag sau câu lệnh.\nAliases: `whos`, `whois`, `info`".format(prefix),
@@ -117,10 +125,10 @@ class Help(commands.Cog):
             description="- Xem ảnh gái xinh: `{0}girl`.\nAliases: `girl`, `xinh`, `simp`, `gai`\n\n- Xem ảnh trai: `{0}trai`.\nAliases: `trai`, `zai`, `boy`, `handsome`, `man`\n\n- Xem ảnh đồ ăn: `{0}food`.".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
-        elif args[0] in ['slap','kiss', 'hug', 'pat']:
+        elif args[0] in ['slap','kiss', 'hug', 'pat', 'lick', 'kill', 'poke']:
             embedVar = discord.Embed(
             title="Hành động",
-            description="- Gửi các hành động gif: `{0}[action]`.\nAliases: `slap`,`kiss`, `hug`, `pat`\n\nCó thể tag người khác bằng lệnh `{0}[action]` + `[@user]`".format(prefix),
+            description="- Gửi các hành động gif: `{0}[action]`.\nAliases: `slap`,`kiss`, `hug`, `pat`, `lick`, `kill`, `poke`\n\nCó thể tag người khác bằng lệnh `{0}[action]` + `[@user]`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['avatar', 'ava']:
@@ -144,13 +152,13 @@ class Help(commands.Cog):
         elif args[0] in ['currency', 'cur']:
             embedVar = discord.Embed(
             title="Chuyển đổi tiền tệ",
-            description="Lệnh: `{0}currency [số tiền] [trước] [sau]`.\nAliases: `cur`\n\n**Dịch:** `{0}translate [lang1]>[lang2] [trước] [sau]`.\nAliases: `tr`, `trans`".format(prefix),
+            description="Lệnh: `{0}currency [xxx]>[yyy] [số tiền]`.\nVí dụ `{0}currency 100 usd>vnd`.\nAliases: `cur`\n\nDanh sách loại tiền tệ có thể chuyển đổi: `{0}currencies`\nAliases: `curs`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['translate', 'trans', 'tr', 'langs', 'tls', 'translatelangs']:
             embedVar = discord.Embed(
             title="Dịch ngôn ngữ",
-            description="**Dịch:** `{0}translate [lang1]>[lang2] [trước] [sau]`.\nAliases: `tr`, `trans`\n\nKhi không có `[lang1]>[lang2]` sẽ tự động dịch sang tiếng Việt.\n\n**Danh sách các code ngôn ngữ:** `{0}translatelangs`\nAliases: `tls`, `langs`".format(prefix),
+            description="**Dịch:** `{0}translate [lang1]>[lang2] [nội dung]`.\nAliases: `tr`, `trans`\n\nKhi không có `[lang1]>[lang2]` sẽ tự động dịch sang tiếng Việt.\n\n**Danh sách các code ngôn ngữ:** `{0}translatelangs`\nAliases: `tls`, `langs`".format(prefix),
             color=0x00ff00)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['ping', 'prefix', 'nick']:
@@ -167,13 +175,13 @@ class Help(commands.Cog):
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['lt', 'loto']:
             embedVar = discord.Embed(
-            title="Trò chơi LôTô",
+            title="Trò chơi LôTô (No longer support)",
             description="Bắt đầu trò chơi trước rồi mới được thực hiện các chức năng khác nhé. Vui chơi lành mạnh nào. \n\n- Bắt đầu trò chơi bằng lệnh:  `{0}lotostart`.\nAliases: `lotos`, `ltstart`, `lts`\n\n- Quay số:  `{0}loto`.\nAliases: `lt`\n\n- Kiểm tra kết quả:  `{0}lotocheck` `a b c d e`\nAliases: `lotoc`, `ltc`, `ltcheck`\n\n- Xem các số đã quay:  `{0}lotoall`\nAliases: `lotoa`, `lta`, `ltall`\n\n- Kết thúc và xóa toàn bộ:  `{0}lotoend`\nAliases: `lotoe`, `lte`, `ltend`".format(prefix),
             color=0x34ebae)
             msg = await ctx.channel.send(embed=embedVar)
         elif args[0] in ['bj', 'blackjack']:
             embedVar = discord.Embed(
-            title="Trò chơi Xì Zách",
+            title="Trò chơi Xì Zách (No longer support)",
             description="`{0}blackjack` hoặc `{0}bj` để xem tiếp hướng dẫn. :yaya:".format(prefix),
             color=0x34ebae)
             msg = await ctx.channel.send(embed=embedVar)
@@ -181,6 +189,53 @@ class Help(commands.Cog):
             embedVar = discord.Embed(
             title="Xem tin đã xóa",
             description="- Dùng lệnh:  `{0}snipe`.\nAliases: `spy`\n\n- Xem danh sách các tin đã xóa gần nhất:  `{0}snipelog`.\nAliases: `snipel`, `snlog`, `spylog`, `spyl`".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['weather', 'wea']:
+            embedVar = discord.Embed(
+            title="Xem thời tiết hôm nay",
+            description="- Dùng lệnh:  `{0}weather` để xem thời tiết tại TP HCM.\nAliases: `wea`\n\n- Xem thời tiết ở nơi khác:  `{0}weather` `[tên-thành-phố]`.".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['conv', 'convert']:
+            embedVar = discord.Embed(
+            title="Chuyển đổi đơn vị",
+            description="- Dùng lệnh:  `{0}convert` `[type]` `[src]>[dest]` `[giá trị]` để chuyển đổi giá trị từ `[src]` sang `[dest]`.\nAliases: `conv`\n\n- Xem các loại đơn vị có thể dùng:  `{0}unit` hoặc `{0}units`.".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['google', 'gg']:
+            embedVar = discord.Embed(
+            title="Tìm kiếm google",
+            description="- Dùng lệnh:  `{0}google` `[nội dung]` để tìm kết quả hàng đầu cho nội dung cần tìm.\nAliases: `gg`\n\nMiễn là bạn đừng spam, thì cuộc đời sẽ vốn rất đẹp.".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['hpbd']:
+            embedVar = discord.Embed(
+            title="Xem hôm nay là sinh nhật ai nào",
+            description="- Dùng lệnh:  `{0}hpbd` để xem hôm nay là sinh nhật ai hoặc xem sắp tới là sinh nhật ai.\nXem sinh nhật trong tháng chỉ định: `{0}hpbd` `[số tháng]`.\nNếu bạn không có sinh nhật, dùng lệnh `{0}help` `bd` để xem cách thêm sinh nhật vào nhé.".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['color', 'colors']:
+            embedVar = discord.Embed(
+            title="Khám phá sắc màu",
+            description="- Dùng lệnh:  `{0}color` `[mã màu]` để xem màu theo mã màu RGB, HEX hoặc INT\n*Ví dụ*:\n+HEX: `{0}color` `1234567`\n+INT: `{0}color` `#123456`\n+RGB: `{0}color` `255,0,255`\n\nAliases: `colors`".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['iphone', 'ipad', 'phone', 'pad']:
+            embedVar = discord.Embed(
+            title="Xem hàng nhà Táo",
+            description="Xem iphone hoặc ipad.",
+            color=0x34ebae)
+        elif args[0] in ['ship']:
+            embedVar = discord.Embed(
+            title="Gắn kết đôi lứa",
+            description="Ghép đôi hai người: `{0}ship` `[A]` | `[B]`.".format(prefix),
+            color=0x34ebae)
+            msg = await ctx.channel.send(embed=embedVar)
+        elif args[0] in ['mage', 'image']:
+            embedVar = discord.Embed(
+            title="Xem ảnh",
+            description="Xem ảnh theo chủ đề: `{0}mage` `[Chủ đề]`.".format(prefix),
             color=0x34ebae)
             msg = await ctx.channel.send(embed=embedVar)
         else:
@@ -194,7 +249,7 @@ class Help(commands.Cog):
 
         await msg.add_reaction("🗑️")
         def check(reaction, user):
-            return user == ctx.author
+            return user == ctx.author and str(reaction.emoji) == '🗑️' and reaction.message == msg
         reaction, user = await self.client.wait_for('reaction_add', check=check)
         await msg.delete()
 
